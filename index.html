@@ -134,6 +134,34 @@ canvas{display:none}
   pointer-events:none;
 }
 
+
+.zoom-controls{
+  position:absolute;
+  left:12px;
+  right:12px;
+  bottom:110px;
+  display:none;
+  gap:8px;
+  align-items:center;
+  justify-content:center;
+  background:rgba(9,11,16,.72);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:8px;
+  backdrop-filter:blur(10px);
+  z-index:5;
+}
+
+.zoom-controls button{
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:13px;
+}
+
+.zoom-controls input{
+  max-width:160px;
+}
+
 .shutter{
   width:78px;
   height:78px;
@@ -470,6 +498,12 @@ input[type=range]{
         <div class="camera-controls" id="cameraControls">
           <button class="shutter" onclick="capturePhoto()" aria-label="Capture photo"></button>
         </div>
+
+        <div class="zoom-controls" id="zoomControls">
+          <button onclick="setCameraZoom(1)">1x</button>
+          <button onclick="setCameraZoom(2)">2x</button>
+          <input id="zoomSlider" type="range" min="1" max="2" step="0.1" value="1" oninput="setCameraZoom(this.value)" />
+        </div>
       </div>
 
       <div class="scan-actions">
@@ -590,6 +624,8 @@ const tipModal=document.getElementById("tipModal");
 const recentGrid=document.getElementById("recentGrid");
 const cropOverlay=document.getElementById("cropOverlay");
 const editPreviewWrap=document.getElementById("editPreviewWrap");
+const zoomControls=document.getElementById("zoomControls");
+const zoomSlider=document.getElementById("zoomSlider");
 
 let db=null;
 let sourceImageData=null;
@@ -606,6 +642,9 @@ let cropStart=null;
 let straightenPreviewActive=false;
 let straightenBaseOriginal=null;
 let straightenBaseWorking=null;
+
+let cameraTrack=null;
+let zoomCapabilities=null;
 
 function closeTip(){tipModal.style.display="none"}
 
@@ -734,6 +773,8 @@ async function startCamera(){
     });
 
     video.srcObject=stream;
+    cameraTrack=stream.getVideoTracks()[0];
+    setupZoomControls(cameraTrack);
     video.style.display="block";
     emptyState.style.display="none";
     cameraControls.style.display="flex";
@@ -746,6 +787,9 @@ async function startCamera(){
 function stopCamera(){
   const stream=video.srcObject;
   if(stream)stream.getTracks().forEach(track=>track.stop());
+  cameraTrack=null;
+  zoomCapabilities=null;
+  if(zoomControls)zoomControls.style.display="none";
   video.srcObject=null;
 }
 
@@ -1236,6 +1280,62 @@ function rotateImageDataArbitrary(imageData,angleDegrees){
   outCtx.drawImage(temp,-w/2,-h/2);
 
   return outCtx.getImageData(0,0,newW,newH);
+}
+
+
+function setupZoomControls(track){
+  if(!zoomControls||!zoomSlider){
+    return;
+  }
+
+  if(!track||!track.getCapabilities){
+    zoomControls.style.display="none";
+    return;
+  }
+
+  const capabilities=track.getCapabilities();
+
+  if(!capabilities.zoom){
+    zoomControls.style.display="none";
+    return;
+  }
+
+  zoomCapabilities=capabilities.zoom;
+
+  const minZoom=zoomCapabilities.min||1;
+  const maxZoom=Math.min(zoomCapabilities.max||2,2);
+
+  if(maxZoom<=minZoom){
+    zoomControls.style.display="none";
+    return;
+  }
+
+  zoomSlider.min=minZoom;
+  zoomSlider.max=maxZoom;
+  zoomSlider.step=zoomCapabilities.step||0.1;
+  zoomSlider.value=minZoom;
+
+  zoomControls.style.display="flex";
+}
+
+async function setCameraZoom(value){
+  if(!cameraTrack||!zoomCapabilities)return;
+
+  let zoom=parseFloat(value);
+  const minZoom=zoomCapabilities.min||1;
+  const maxZoom=Math.min(zoomCapabilities.max||2,2);
+
+  zoom=Math.max(minZoom,Math.min(maxZoom,zoom));
+
+  try{
+    await cameraTrack.applyConstraints({
+      advanced:[{zoom}]
+    });
+
+    if(zoomSlider)zoomSlider.value=zoom;
+  }catch(err){
+    console.warn("Zoom not supported or failed:",err);
+  }
 }
 
 function downloadImage(){
