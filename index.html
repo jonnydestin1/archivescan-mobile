@@ -7,54 +7,53 @@
 
 <style>
   :root {
-    --bg: #08090c;
-    --panel: #14161b;
-    --panel2: #1d2027;
-    --text: #f6f1e8;
-    --muted: #a2a5ad;
-    --line: #2b2f38;
-    --accent: #f2b84b;
-    --accent2: #d99528;
-    --danger: #c84f4f;
-    --good: #70d08a;
+    --bg: #0A0916;
+    --bg2: #100E24;
+    --panel: #17152A;
+    --panel2: #211E3A;
+    --text: #F6F6F9;
+    --muted: #A8A4BA;
+    --line: #302B52;
+    --accent: #8C6BFF;
+    --accent2: #6BEA84;
+    --danger: #F06B6B;
+    --shadow: rgba(0,0,0,0.55);
   }
 
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
 
   html, body {
     margin: 0;
     min-height: 100%;
     background:
-      radial-gradient(circle at top, #222735 0%, #08090c 48%),
-      var(--bg);
+      radial-gradient(circle at top left, rgba(140,107,255,0.22), transparent 38%),
+      radial-gradient(circle at bottom right, rgba(107,234,132,0.10), transparent 35%),
+      linear-gradient(180deg, var(--bg2), var(--bg));
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
   }
 
   body {
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
   .app {
-    width: 100%;
     max-width: 980px;
     margin: 0 auto;
-    padding: 12px;
-    padding-bottom: 26px;
+    padding: 10px;
+    padding-bottom: 170px;
   }
 
   header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    align-items: center;
     padding: 8px 2px 12px;
   }
 
   .brand-title {
-    font-size: 25px;
+    font-size: 24px;
     font-weight: 850;
     letter-spacing: -0.6px;
   }
@@ -67,27 +66,25 @@
 
   .pill {
     border: 1px solid var(--line);
-    background: rgba(255,255,255,0.055);
+    background: rgba(255,255,255,0.06);
     color: var(--muted);
     padding: 8px 10px;
     border-radius: 999px;
     font-size: 12px;
-    white-space: nowrap;
   }
 
   .preview-card {
-    background: rgba(20,22,27,0.9);
+    background: rgba(23,21,42,0.92);
     border: 1px solid var(--line);
     border-radius: 24px;
     overflow: hidden;
-    box-shadow: 0 18px 55px rgba(0,0,0,0.42);
+    box-shadow: 0 20px 60px var(--shadow);
   }
 
   .preview-top {
     padding: 10px 12px;
     display: flex;
     justify-content: space-between;
-    gap: 10px;
     color: var(--muted);
     font-size: 13px;
     border-bottom: 1px solid var(--line);
@@ -96,8 +93,8 @@
   .preview-wrap {
     position: relative;
     width: 100%;
-    min-height: 360px;
-    background: #030303;
+    min-height: 370px;
+    background: #020208;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -106,14 +103,12 @@
 
   video, canvas {
     width: 100%;
-    max-height: 70vh;
+    max-height: 72vh;
     display: block;
     background: #000;
   }
 
-  canvas {
-    display: none;
-  }
+  canvas { display: none; }
 
   .empty-state {
     position: absolute;
@@ -128,8 +123,8 @@
   }
 
   .empty-state strong {
-    display: block;
     color: var(--text);
+    display: block;
     font-size: 20px;
     margin-bottom: 8px;
   }
@@ -138,9 +133,8 @@
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 14px;
+    bottom: 18px;
     display: none;
-    align-items: center;
     justify-content: center;
     pointer-events: none;
   }
@@ -148,12 +142,10 @@
   .shutter {
     width: 78px;
     height: 78px;
-    border-radius: 999px;
-    border: 5px solid rgba(255,255,255,0.86);
-    background: rgba(255,255,255,0.2);
-    box-shadow:
-      0 0 0 4px rgba(0,0,0,0.45),
-      0 10px 30px rgba(0,0,0,0.55);
+    border-radius: 50%;
+    border: 5px solid rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.18);
+    box-shadow: 0 0 0 4px rgba(0,0,0,0.45), 0 12px 34px rgba(0,0,0,0.6);
     pointer-events: auto;
     padding: 0;
   }
@@ -161,11 +153,26 @@
   .shutter::after {
     content: "";
     display: block;
-    width: 54px;
-    height: 54px;
+    width: 52px;
+    height: 52px;
     margin: auto;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.92);
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  .before-after-wrap {
+    display: none;
+    padding: 12px;
+    background: rgba(10,9,22,0.85);
+    border-top: 1px solid var(--line);
+  }
+
+  .before-after-label {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 6px;
   }
 
   .top-actions {
@@ -191,132 +198,153 @@
     user-select: none;
   }
 
-  button:active, .file-label:active {
-    transform: scale(0.985);
-  }
+  button:active, .file-label:active { transform: scale(0.985); }
 
   .accent {
-    background: linear-gradient(180deg, var(--accent), var(--accent2));
-    color: #1b1202;
+    background: linear-gradient(180deg, var(--accent), #6f50e8);
+    color: white;
+  }
+
+  .green {
+    background: linear-gradient(180deg, var(--accent2), #3cc866);
+    color: #06120a;
   }
 
   .ghost {
     background: rgba(255,255,255,0.06);
     border: 1px solid var(--line);
-    color: var(--text);
   }
 
   .danger {
-    background: rgba(200,79,79,0.14);
-    color: #ffb6b6;
-    border: 1px solid rgba(200,79,79,0.35);
+    background: rgba(240,107,107,0.13);
+    color: #ffd0d0;
+    border: 1px solid rgba(240,107,107,0.35);
   }
 
-  .success {
-    background: rgba(112,208,138,0.16);
-    color: #bff7cc;
-    border: 1px solid rgba(112,208,138,0.32);
-  }
-
-  input[type="file"] {
-    display: none;
-  }
-
-  .workflow {
-    margin-top: 14px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-
-  .edit-panel {
-    margin-top: 14px;
-    background: rgba(20,22,27,0.9);
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    overflow: hidden;
-  }
-
-  .panel-header {
-    padding: 14px;
-    border-bottom: 1px solid var(--line);
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    align-items: start;
-  }
-
-  .panel-title {
-    font-size: 16px;
-    font-weight: 850;
-  }
-
-  .panel-note {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 3px;
-    line-height: 1.35;
-  }
-
-  .tiny-button {
-    padding: 8px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    white-space: nowrap;
-  }
-
-  .sliders {
-    padding: 8px 14px 16px;
-  }
-
-  .control {
-    padding: 11px 0;
-  }
-
-  .control-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    margin-bottom: 8px;
-  }
-
-  .control-row span:last-child {
-    color: var(--accent);
-    font-variant-numeric: tabular-nums;
-  }
+  input[type="file"] { display: none; }
 
   input[type="range"] {
     width: 100%;
-    accent-color: var(--accent);
+    accent-color: var(--accent2);
   }
 
-  .save-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    padding: 12px 14px 16px;
+  .bottom-editor {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    background: rgba(10,9,22,0.96);
     border-top: 1px solid var(--line);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.48);
+  }
+
+  .tool-drawer {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 12px 12px 8px;
+    display: none;
+  }
+
+  .tool-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .tool-title {
+    font-size: 14px;
+    font-weight: 850;
+  }
+
+  .tool-note {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .slider-row {
+    display: none;
+    gap: 12px;
+    align-items: center;
+    margin: 8px 0;
+  }
+
+  .slider-row.active { display: flex; }
+
+  .slider-name {
+    width: 92px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .slider-value {
+    width: 42px;
+    text-align: right;
+    font-size: 13px;
+    color: var(--accent2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tool-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .tool-actions button {
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 13px;
+  }
+
+  .toolbar {
+    max-width: 980px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .tool-button {
+    background: transparent;
+    border-radius: 14px;
+    padding: 8px 4px;
+    color: var(--muted);
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .tool-button .icon {
+    font-size: 20px;
+  }
+
+  .tool-button.active {
+    color: var(--accent2);
+    background: rgba(107,234,132,0.10);
   }
 
   .tip-strip {
-    margin-top: 14px;
+    margin-top: 12px;
     padding: 12px 14px;
-    border: 1px solid rgba(242,184,75,0.35);
+    border: 1px solid rgba(107,234,132,0.35);
     border-radius: 18px;
-    background: rgba(242,184,75,0.10);
-    color: #f5dba0;
+    background: rgba(107,234,132,0.08);
+    color: #c8ffd5;
     font-size: 13px;
     line-height: 1.45;
-  }
-
-  .tip-strip b {
-    color: var(--text);
   }
 
   .modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.72);
+    background: rgba(0,0,0,0.76);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -326,70 +354,31 @@
 
   .modal {
     width: min(520px, 100%);
-    background: #171a20;
+    background: #17152A;
     border: 1px solid var(--line);
     border-radius: 26px;
-    box-shadow: 0 30px 90px rgba(0,0,0,0.65);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.7);
     padding: 20px;
   }
 
   .modal h2 {
     margin: 0 0 8px;
     font-size: 24px;
-    letter-spacing: -0.5px;
   }
 
-  .modal p {
+  .modal p, .modal li {
     color: var(--muted);
-    line-height: 1.48;
-    margin: 10px 0;
+    line-height: 1.5;
   }
 
   .modal ul {
-    margin: 14px 0 18px;
     padding-left: 20px;
-    color: var(--text);
-    line-height: 1.55;
-  }
-
-  .modal li {
-    margin-bottom: 7px;
-  }
-
-  .modal-actions {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
   }
 
   @media (max-width: 560px) {
-    .app {
-      padding: 10px;
-    }
-
-    .brand-title {
-      font-size: 22px;
-    }
-
-    .preview-wrap {
-      min-height: 330px;
-    }
-
-    .top-actions,
-    .workflow,
-    .save-row {
-      grid-template-columns: 1fr;
-    }
-
-    .shutter {
-      width: 74px;
-      height: 74px;
-    }
-
-    .shutter::after {
-      width: 50px;
-      height: 50px;
-    }
+    .preview-wrap { min-height: 340px; }
+    .top-actions { grid-template-columns: 1fr; }
+    .slider-name { width: 80px; }
   }
 </style>
 </head>
@@ -399,18 +388,13 @@
 <div class="modal-backdrop" id="tipModal">
   <div class="modal">
     <h2>Before you scan</h2>
-    <p>
-      ArchiveScan works best when the negative is evenly lit and flat.
-      The app can correct color, but it cannot fully rescue blur, glare, or shadows.
-    </p>
+    <p>ArchiveScan works best when the negative is evenly lit and flat.</p>
     <ul>
-      <li>Put the negative in front of a bright, evenly lit white screen or light pad.</li>
-      <li>Keep the phone square to the negative.</li>
-      <li>Avoid glare, shadows, and curled film edges.</li>
+      <li>Use a bright white screen or light pad behind the negative.</li>
+      <li>Keep your phone square to the film.</li>
+      <li>Avoid glare, shadows, blur, and curled edges.</li>
     </ul>
-    <div class="modal-actions">
-      <button class="accent" onclick="closeTip()">Got it</button>
-    </div>
+    <button class="green" onclick="closeTip()">Got it</button>
   </div>
 </div>
 
@@ -418,7 +402,7 @@
   <header>
     <div>
       <div class="brand-title">ArchiveScan</div>
-      <div class="brand-subtitle">Turn negatives into photos</div>
+      <div class="brand-subtitle">Reveal negatives into photos</div>
     </div>
     <div class="pill" id="statusPill">Ready</div>
   </header>
@@ -426,7 +410,7 @@
   <section class="preview-card">
     <div class="preview-top">
       <span id="previewLabel">Camera / Preview</span>
-      <span id="modeLabel">Auto Convert On</span>
+      <span id="modeLabel">Reveal Mode</span>
     </div>
 
     <div class="preview-wrap">
@@ -436,7 +420,7 @@
       <div class="empty-state" id="emptyState">
         <div>
           <strong>Start with a negative</strong>
-          Open the camera or choose an image from your phone.
+          Open the camera or choose an image.
         </div>
       </div>
 
@@ -445,106 +429,77 @@
       </div>
     </div>
 
+    <div class="before-after-wrap" id="beforeAfterWrap">
+      <div class="before-after-label">
+        <span>Original</span>
+        <span>Revealed</span>
+      </div>
+      <input id="beforeAfterSlider" type="range" min="0" max="100" value="100" oninput="updateBeforeAfter()" />
+    </div>
+
     <div class="top-actions">
       <button onclick="startCamera()">Open Camera</button>
-
       <label class="file-label" for="fileInput">Choose Photo</label>
       <input id="fileInput" type="file" accept="image/*" onchange="loadFile(event)" />
     </div>
   </section>
 
-  <div class="workflow">
-    <button class="ghost" onclick="cropPlaceholder()">Crop</button>
-    <button class="accent" onclick="processImage()">Convert</button>
-    <button class="success" onclick="downloadImage()">Save Result</button>
+  <div class="tip-strip">
+    <b>Tip:</b> Put the negative in front of an evenly lit white screen or light pad. Keep the camera square and avoid glare.
+  </div>
+</div>
+
+<div class="bottom-editor">
+  <div class="tool-drawer" id="toolDrawer">
+    <div class="tool-title-row">
+      <div>
+        <div class="tool-title" id="toolTitle">Light</div>
+        <div class="tool-note" id="toolNote">Adjust the revealed photo while keeping the image visible.</div>
+      </div>
+      <button class="ghost" style="padding:8px 10px;border-radius:999px;font-size:12px;" onclick="closeDrawer()">Close</button>
+    </div>
+
+    <div id="lightControls">
+      <div class="slider-row active"><div class="slider-name">Whites</div><input id="whites" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="whitesVal">0</div></div>
+      <div class="slider-row active"><div class="slider-name">Blacks</div><input id="blacks" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="blacksVal">0</div></div>
+      <div class="slider-row active"><div class="slider-name">Highlights</div><input id="highlights" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="highlightsVal">0</div></div>
+      <div class="slider-row active"><div class="slider-name">Shadows</div><input id="shadows" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="shadowsVal">0</div></div>
+      <div class="slider-row active"><div class="slider-name">Brightness</div><input id="brightness" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="brightnessVal">0</div></div>
+      <div class="slider-row active"><div class="slider-name">Contrast</div><input id="contrast" type="range" min="-100" max="100" value="10" oninput="sliderChanged()"><div class="slider-value" id="contrastVal">10</div></div>
+    </div>
+
+    <div id="colorControls" style="display:none;">
+      <div class="slider-row active"><div class="slider-name">Saturation</div><input id="saturation" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="saturationVal">0</div></div>
+      <div class="slider-row active"><div class="slider-name">Warmth</div><input id="warmth" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="warmthVal">0</div></div>
+      <div class="slider-row active"><div class="slider-name">Tint</div><input id="tint" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="tintVal">0</div></div>
+    </div>
+
+    <div id="cropControls" style="display:none;">
+      <div class="tool-note">Crop tools are staged here. Real drag-crop comes next.</div>
+      <div class="tool-actions">
+        <button class="ghost" onclick="cropPlaceholder()">Crop</button>
+        <button class="ghost" onclick="rotateCanvas()">Rotate</button>
+        <button class="ghost" onclick="cropPlaceholder()">Perspective</button>
+      </div>
+    </div>
+
+    <div id="beforeControls" style="display:none;">
+      <div class="tool-note">Drag the reveal slider under the image to compare the negative with the finished photo.</div>
+    </div>
+
+    <div class="tool-actions">
+      <button class="ghost" onclick="resetEdits()">Reset</button>
+      <button class="accent" onclick="processImage()">Reveal</button>
+      <button class="green" onclick="downloadImage()">Save</button>
+    </div>
   </div>
 
-  <section class="edit-panel">
-    <div class="panel-header">
-      <div>
-        <div class="panel-title">Fine Tune</div>
-        <div class="panel-note">Use the light controls first. Small moves usually look better.</div>
-      </div>
-      <button class="ghost tiny-button" onclick="showTip()">Tip</button>
-    </div>
-
-    <div class="sliders">
-      <div class="control">
-        <div class="control-row">
-          <span>Whites</span>
-          <span id="whitesVal">0</span>
-        </div>
-        <input id="whites" type="range" min="-100" max="100" value="0" oninput="sliderChanged()" />
-      </div>
-
-      <div class="control">
-        <div class="control-row">
-          <span>Blacks</span>
-          <span id="blacksVal">0</span>
-        </div>
-        <input id="blacks" type="range" min="-100" max="100" value="0" oninput="sliderChanged()" />
-      </div>
-
-      <div class="control">
-        <div class="control-row">
-          <span>Highlights</span>
-          <span id="highlightsVal">0</span>
-        </div>
-        <input id="highlights" type="range" min="-100" max="100" value="0" oninput="sliderChanged()" />
-      </div>
-
-      <div class="control">
-        <div class="control-row">
-          <span>Shadows</span>
-          <span id="shadowsVal">0</span>
-        </div>
-        <input id="shadows" type="range" min="-100" max="100" value="0" oninput="sliderChanged()" />
-      </div>
-
-      <div class="control">
-        <div class="control-row">
-          <span>Brightness</span>
-          <span id="brightnessVal">0</span>
-        </div>
-        <input id="brightness" type="range" min="-100" max="100" value="0" oninput="sliderChanged()" />
-      </div>
-
-      <div class="control">
-        <div class="control-row">
-          <span>Contrast</span>
-          <span id="contrastVal">10</span>
-        </div>
-        <input id="contrast" type="range" min="-100" max="100" value="10" oninput="sliderChanged()" />
-      </div>
-
-      <div class="control">
-        <div class="control-row">
-          <span>Saturation</span>
-          <span id="saturationVal">0</span>
-        </div>
-        <input id="saturation" type="range" min="-100" max="100" value="0" oninput="sliderChanged()" />
-      </div>
-
-      <div class="control">
-        <div class="control-row">
-          <span>Warmth</span>
-          <span id="warmthVal">0</span>
-        </div>
-        <input id="warmth" type="range" min="-100" max="100" value="0" oninput="sliderChanged()" />
-      </div>
-    </div>
-
-    <div class="save-row">
-      <button class="ghost" onclick="resetEdits()">Reset Edits</button>
-      <button class="ghost" onclick="toggleBeforeAfter()">Before / After</button>
-      <button class="danger" onclick="clearImage()">Start Over</button>
-      <button class="success" onclick="downloadImage()">Save Result</button>
-    </div>
-  </section>
-
-  <div class="tip-strip">
-    <b>Tip:</b> Put the negative in front of an evenly lit white screen or light pad.
-    Keep the camera square to the negative and avoid glare.
+  <div class="toolbar">
+    <button class="tool-button" id="cameraBtn" onclick="startCamera()"><span class="icon">📷</span><span>Camera</span></button>
+    <button class="tool-button" id="lightBtn" onclick="openTool('light')"><span class="icon">💡</span><span>Light</span></button>
+    <button class="tool-button" id="colorBtn" onclick="openTool('color')"><span class="icon">🎨</span><span>Color</span></button>
+    <button class="tool-button" id="cropBtn" onclick="openTool('crop')"><span class="icon">✂️</span><span>Crop</span></button>
+    <button class="tool-button" id="beforeBtn" onclick="openTool('before')"><span class="icon">↔️</span><span>Compare</span></button>
   </div>
 </div>
 
@@ -558,30 +513,66 @@ const statusPill = document.getElementById("statusPill");
 const previewLabel = document.getElementById("previewLabel");
 const cameraControls = document.getElementById("cameraControls");
 const tipModal = document.getElementById("tipModal");
+const beforeAfterWrap = document.getElementById("beforeAfterWrap");
+const beforeAfterSlider = document.getElementById("beforeAfterSlider");
 
 let originalImageData = null;
 let processedImageData = null;
 let currentImageLoaded = false;
 let converted = false;
-let showingBefore = false;
-let cameraActive = false;
 
-function showTip() {
-  tipModal.style.display = "flex";
+function showTip(){ tipModal.style.display = "flex"; }
+function closeTip(){ tipModal.style.display = "none"; }
+
+function openTool(tool) {
+  document.getElementById("toolDrawer").style.display = "block";
+
+  ["cameraBtn","lightBtn","colorBtn","cropBtn","beforeBtn"].forEach(id => document.getElementById(id).classList.remove("active"));
+  ["lightControls","colorControls","cropControls","beforeControls"].forEach(id => document.getElementById(id).style.display = "none");
+  beforeAfterWrap.style.display = "none";
+
+  if (tool === "light") {
+    lightBtn.classList.add("active");
+    lightControls.style.display = "block";
+    toolTitle.textContent = "Light";
+    toolNote.textContent = "Shape the whites, blacks, highlights, and shadows.";
+  }
+
+  if (tool === "color") {
+    colorBtn.classList.add("active");
+    colorControls.style.display = "block";
+    toolTitle.textContent = "Color";
+    toolNote.textContent = "Correct warmth, tint, and saturation.";
+  }
+
+  if (tool === "crop") {
+    cropBtn.classList.add("active");
+    cropControls.style.display = "block";
+    toolTitle.textContent = "Crop";
+    toolNote.textContent = "Clean the edges and frame the photo.";
+  }
+
+  if (tool === "before") {
+    beforeBtn.classList.add("active");
+    beforeControls.style.display = "block";
+    beforeAfterWrap.style.display = "block";
+    toolTitle.textContent = "Before / After";
+    toolNote.textContent = "Slide to reveal the finished image.";
+    updateBeforeAfter();
+  }
 }
 
-function closeTip() {
-  tipModal.style.display = "none";
+function closeDrawer() {
+  document.getElementById("toolDrawer").style.display = "none";
+  beforeAfterWrap.style.display = "none";
+  ["cameraBtn","lightBtn","colorBtn","cropBtn","beforeBtn"].forEach(id => document.getElementById(id).classList.remove("active"));
 }
 
 async function startCamera() {
   try {
+    closeDrawer();
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: "environment",
-        width: { ideal: 1920 },
-        height: { ideal: 1080 }
-      },
+      video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
     });
 
@@ -590,12 +581,12 @@ async function startCamera() {
     canvas.style.display = "none";
     emptyState.style.display = "none";
     cameraControls.style.display = "flex";
+    beforeAfterWrap.style.display = "none";
 
-    cameraActive = true;
-    converted = false;
     currentImageLoaded = false;
-    showingBefore = false;
+    converted = false;
 
+    cameraBtn.classList.add("active");
     statusPill.textContent = "Camera";
     previewLabel.textContent = "Live Camera";
   } catch (err) {
@@ -605,9 +596,7 @@ async function startCamera() {
 
 function stopCamera() {
   const stream = video.srcObject;
-  if (stream) {
-    stream.getTracks().forEach(track => track.stop());
-  }
+  if (stream) stream.getTracks().forEach(track => track.stop());
   video.srcObject = null;
 }
 
@@ -619,20 +608,16 @@ function capturePhoto() {
 
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
-
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
   originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
   stopCamera();
-
   video.style.display = "none";
   canvas.style.display = "block";
   cameraControls.style.display = "none";
 
   currentImageLoaded = true;
-  cameraActive = false;
-  showingBefore = false;
-
   statusPill.textContent = "Captured";
   previewLabel.textContent = "Captured Negative";
 
@@ -644,12 +629,11 @@ function loadFile(event) {
   if (!file) return;
 
   const img = new Image();
-
   img.onload = function () {
     canvas.width = img.width;
     canvas.height = img.height;
-
     ctx.drawImage(img, 0, 0);
+
     originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
     video.style.display = "none";
@@ -658,16 +642,11 @@ function loadFile(event) {
     cameraControls.style.display = "none";
 
     currentImageLoaded = true;
-    converted = false;
-    showingBefore = false;
-    cameraActive = false;
-
     statusPill.textContent = "Loaded";
     previewLabel.textContent = "Loaded Negative";
 
     processImage();
   };
-
   img.src = URL.createObjectURL(file);
 }
 
@@ -677,15 +656,7 @@ function processImage() {
     return;
   }
 
-  const whites = parseInt(document.getElementById("whites").value);
-  const blacks = parseInt(document.getElementById("blacks").value);
-  const highlights = parseInt(document.getElementById("highlights").value);
-  const shadows = parseInt(document.getElementById("shadows").value);
-  const brightness = parseInt(document.getElementById("brightness").value);
-  const contrast = parseInt(document.getElementById("contrast").value);
-  const saturation = parseInt(document.getElementById("saturation").value);
-  const warmth = parseInt(document.getElementById("warmth").value);
-
+  const vals = getSliderValues();
   const src = new Uint8ClampedArray(originalImageData.data);
   const output = ctx.createImageData(canvas.width, canvas.height);
   const data = output.data;
@@ -694,13 +665,9 @@ function processImage() {
   const pixelCount = src.length / 4;
 
   for (let i = 0; i < src.length; i += 4) {
-    const r = 255 - src[i];
-    const g = 255 - src[i + 1];
-    const b = 255 - src[i + 2];
-
-    rAvg += r;
-    gAvg += g;
-    bAvg += b;
+    rAvg += 255 - src[i];
+    gAvg += 255 - src[i + 1];
+    bAvg += 255 - src[i + 2];
   }
 
   rAvg /= pixelCount;
@@ -708,39 +675,33 @@ function processImage() {
   bAvg /= pixelCount;
 
   const grayAvg = (rAvg + gAvg + bAvg) / 3;
-
   const rScale = grayAvg / Math.max(rAvg, 1);
   const gScale = grayAvg / Math.max(gAvg, 1);
   const bScale = grayAvg / Math.max(bAvg, 1);
-
-  const contrastFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+  const contrastFactor = (259 * (vals.contrast + 255)) / (255 * (259 - vals.contrast));
 
   for (let i = 0; i < src.length; i += 4) {
-    let r = 255 - src[i];
-    let g = 255 - src[i + 1];
-    let b = 255 - src[i + 2];
+    let r = (255 - src[i]) * rScale;
+    let g = (255 - src[i + 1]) * gScale;
+    let b = (255 - src[i + 2]) * bScale;
 
-    r *= rScale;
-    g *= gScale;
-    b *= bScale;
+    r += vals.warmth * 0.5;
+    b -= vals.warmth * 0.5;
 
-    r += warmth * 0.5;
-    b -= warmth * 0.5;
+    g += vals.tint * 0.35;
+    r -= vals.tint * 0.18;
+    b -= vals.tint * 0.18;
 
-    r = applyLightControls(r, whites, blacks, highlights, shadows);
-    g = applyLightControls(g, whites, blacks, highlights, shadows);
-    b = applyLightControls(b, whites, blacks, highlights, shadows);
+    r = applyLightControls(r, vals);
+    g = applyLightControls(g, vals);
+    b = applyLightControls(b, vals);
 
-    r = contrastFactor * (r - 128) + 128;
-    g = contrastFactor * (g - 128) + 128;
-    b = contrastFactor * (b - 128) + 128;
-
-    r += brightness;
-    g += brightness;
-    b += brightness;
+    r = contrastFactor * (r - 128) + 128 + vals.brightness;
+    g = contrastFactor * (g - 128) + 128 + vals.brightness;
+    b = contrastFactor * (b - 128) + 128 + vals.brightness;
 
     const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-    const satFactor = 1 + saturation / 100;
+    const satFactor = 1 + vals.saturation / 100;
 
     r = gray + (r - gray) * satFactor;
     g = gray + (g - gray) * satFactor;
@@ -753,108 +714,66 @@ function processImage() {
   }
 
   processedImageData = output;
+  converted = true;
+  beforeAfterSlider.value = 100;
   ctx.putImageData(processedImageData, 0, 0);
 
-  converted = true;
-  showingBefore = false;
-
-  statusPill.textContent = "Converted";
-  previewLabel.textContent = "Converted Photo";
+  statusPill.textContent = "Revealed";
+  previewLabel.textContent = "Revealed Photo";
 }
 
-function applyLightControls(value, whites, blacks, highlights, shadows) {
+function applyLightControls(value, vals) {
   let v = value;
+  const n = v / 255;
 
-  const normalized = v / 255;
-
-  if (normalized > 0.72) {
-    v += whites * Math.pow((normalized - 0.72) / 0.28, 1.3) * 0.9;
-  }
-
-  if (normalized < 0.28) {
-    v += blacks * (1 - Math.pow(normalized / 0.28, 1.3)) * 0.9;
-  }
-
-  if (normalized > 0.5) {
-    v += highlights * Math.pow((normalized - 0.5) / 0.5, 1.15) * 0.65;
-  }
-
-  if (normalized < 0.5) {
-    v += shadows * Math.pow((0.5 - normalized) / 0.5, 1.15) * 0.65;
-  }
+  if (n > 0.72) v += vals.whites * Math.pow((n - 0.72) / 0.28, 1.3) * 0.9;
+  if (n < 0.28) v += vals.blacks * (1 - Math.pow(n / 0.28, 1.3)) * 0.9;
+  if (n > 0.5) v += vals.highlights * Math.pow((n - 0.5) / 0.5, 1.15) * 0.65;
+  if (n < 0.5) v += vals.shadows * Math.pow((0.5 - n) / 0.5, 1.15) * 0.65;
 
   return v;
 }
 
+function updateBeforeAfter() {
+  if (!originalImageData || !processedImageData) return;
+
+  const amount = parseInt(beforeAfterSlider.value) / 100;
+  const output = ctx.createImageData(canvas.width, canvas.height);
+  const out = output.data;
+  const a = originalImageData.data;
+  const b = processedImageData.data;
+
+  for (let i = 0; i < out.length; i += 4) {
+    out[i] = a[i] * (1 - amount) + b[i] * amount;
+    out[i + 1] = a[i + 1] * (1 - amount) + b[i + 1] * amount;
+    out[i + 2] = a[i + 2] * (1 - amount) + b[i + 2] * amount;
+    out[i + 3] = 255;
+  }
+
+  ctx.putImageData(output, 0, 0);
+  previewLabel.textContent = amount < 0.5 ? "Original Negative" : "Revealed Photo";
+}
+
 function sliderChanged() {
   updateValues();
-
-  if (currentImageLoaded && !showingBefore) {
-    processImage();
-  }
+  if (currentImageLoaded) processImage();
 }
 
 function resetEdits() {
-  document.getElementById("whites").value = 0;
-  document.getElementById("blacks").value = 0;
-  document.getElementById("highlights").value = 0;
-  document.getElementById("shadows").value = 0;
-  document.getElementById("brightness").value = 0;
+  ["whites","blacks","highlights","shadows","brightness","saturation","warmth","tint"].forEach(id => document.getElementById(id).value = 0);
   document.getElementById("contrast").value = 10;
-  document.getElementById("saturation").value = 0;
-  document.getElementById("warmth").value = 0;
-
   updateValues();
-
-  if (currentImageLoaded) {
-    processImage();
-  }
+  if (currentImageLoaded) processImage();
 }
 
-function clearImage() {
-  stopCamera();
-
-  originalImageData = null;
-  processedImageData = null;
-  currentImageLoaded = false;
-  converted = false;
-  showingBefore = false;
-  cameraActive = false;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  canvas.style.display = "none";
-  video.style.display = "none";
-  cameraControls.style.display = "none";
-  emptyState.style.display = "flex";
-
-  statusPill.textContent = "Ready";
-  previewLabel.textContent = "Camera / Preview";
-}
-
-function toggleBeforeAfter() {
-  if (!currentImageLoaded || !converted) return;
-
-  if (showingBefore) {
-    ctx.putImageData(processedImageData, 0, 0);
-    previewLabel.textContent = "Converted Photo";
-    statusPill.textContent = "After";
-    showingBefore = false;
-  } else {
-    ctx.putImageData(originalImageData, 0, 0);
-    previewLabel.textContent = "Original Negative";
-    statusPill.textContent = "Before";
-    showingBefore = true;
-  }
+function rotateCanvas() {
+  if (!originalImageData) return;
+  alert("Rotate tool is staged. Real rotate/crop comes next.");
 }
 
 function cropPlaceholder() {
-  if (!currentImageLoaded) {
-    alert("Capture or choose a negative first.");
-    return;
-  }
-
-  alert("Crop tool is next. For now, capture square and close to the negative.");
+  if (!currentImageLoaded) alert("Capture or choose a negative first.");
+  else alert("Crop tool is next. Real drag-crop comes in the next pass.");
 }
 
 function downloadImage() {
@@ -863,9 +782,9 @@ function downloadImage() {
     return;
   }
 
-  if (!converted || showingBefore) {
-    processImage();
-  }
+  if (!converted) processImage();
+
+  ctx.putImageData(processedImageData, 0, 0);
 
   const link = document.createElement("a");
   link.download = "archivescan-photo.png";
@@ -873,15 +792,24 @@ function downloadImage() {
   link.click();
 }
 
+function getSliderValues() {
+  return {
+    whites: parseInt(whites.value),
+    blacks: parseInt(blacks.value),
+    highlights: parseInt(highlights.value),
+    shadows: parseInt(shadows.value),
+    brightness: parseInt(brightness.value),
+    contrast: parseInt(contrast.value),
+    saturation: parseInt(saturation.value),
+    warmth: parseInt(warmth.value),
+    tint: parseInt(tint.value)
+  };
+}
+
 function updateValues() {
-  document.getElementById("whitesVal").textContent = document.getElementById("whites").value;
-  document.getElementById("blacksVal").textContent = document.getElementById("blacks").value;
-  document.getElementById("highlightsVal").textContent = document.getElementById("highlights").value;
-  document.getElementById("shadowsVal").textContent = document.getElementById("shadows").value;
-  document.getElementById("brightnessVal").textContent = document.getElementById("brightness").value;
-  document.getElementById("contrastVal").textContent = document.getElementById("contrast").value;
-  document.getElementById("saturationVal").textContent = document.getElementById("saturation").value;
-  document.getElementById("warmthVal").textContent = document.getElementById("warmth").value;
+  ["whites","blacks","highlights","shadows","brightness","contrast","saturation","warmth","tint"].forEach(id => {
+    document.getElementById(id + "Val").textContent = document.getElementById(id).value;
+  });
 }
 
 function clamp(value) {
@@ -889,7 +817,6 @@ function clamp(value) {
 }
 
 updateValues();
-clearImage();
 </script>
 </body>
 </html>
