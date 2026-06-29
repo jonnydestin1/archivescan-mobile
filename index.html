@@ -2,133 +2,391 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>ArchiveScan Mobile</title>
 
 <style>
+  :root {
+    --bg: #0b0c0f;
+    --panel: #15171c;
+    --panel2: #1d2027;
+    --text: #f4f1ea;
+    --muted: #9a9da6;
+    --line: #2b2f38;
+    --accent: #f2b84b;
+    --accent2: #d99528;
+    --danger: #c84f4f;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
   body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #111;
-    color: #eee;
+    background:
+      radial-gradient(circle at top, #232633 0%, #0b0c0f 45%),
+      var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    min-height: 100vh;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 14px;
+    padding-bottom: 28px;
   }
 
   header {
-    padding: 14px;
-    text-align: center;
-    background: #1d1d1d;
-    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 2px 14px;
   }
 
-  header h1 {
-    margin: 0;
-    font-size: 22px;
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
 
-  main {
-    padding: 12px;
-    max-width: 900px;
-    margin: auto;
+  .brand-title {
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .brand-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .pill {
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+    padding: 8px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .preview-card {
+    background: rgba(21,23,28,0.88);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+  }
+
+  .preview-top {
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 13px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .preview-wrap {
+    position: relative;
+    width: 100%;
+    min-height: 340px;
+    background: #050505;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   video, canvas {
     width: 100%;
-    max-height: 70vh;
-    background: #000;
-    border: 1px solid #444;
-    border-radius: 10px;
-    margin-top: 10px;
-  }
-
-  button, input[type="file"] {
-    width: 100%;
-    margin-top: 10px;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: none;
-  }
-
-  button {
-    background: #4c8bf5;
-    color: white;
-    cursor: pointer;
-  }
-
-  button.secondary {
-    background: #333;
-  }
-
-  .controls {
-    margin-top: 14px;
-    padding: 12px;
-    background: #1b1b1b;
-    border-radius: 10px;
-  }
-
-  label {
+    max-height: 68vh;
     display: block;
-    margin-top: 12px;
+    background: #000;
+  }
+
+  canvas {
+    display: none;
+  }
+
+  .empty-state {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 28px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .empty-state strong {
+    display: block;
+    color: var(--text);
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .primary-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px;
+    background: var(--panel);
+    border-top: 1px solid var(--line);
+  }
+
+  button, .file-label {
+    appearance: none;
+    border: 0;
+    border-radius: 16px;
+    padding: 14px 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--text);
+    background: var(--panel2);
+    text-align: center;
+    user-select: none;
+  }
+
+  button:active, .file-label:active {
+    transform: scale(0.98);
+  }
+
+  .accent {
+    background: linear-gradient(180deg, var(--accent), var(--accent2));
+    color: #1b1202;
+  }
+
+  .wide {
+    grid-column: span 2;
+  }
+
+  .ghost {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--line);
+    color: var(--text);
+  }
+
+  .danger {
+    background: rgba(200,79,79,0.14);
+    color: #ffb6b6;
+    border: 1px solid rgba(200,79,79,0.35);
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+
+  .edit-panel {
+    margin-top: 14px;
+    background: rgba(21,23,28,0.88);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .panel-title {
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .panel-note {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .sliders {
+    padding: 8px 14px 16px;
+  }
+
+  .control {
+    padding: 12px 0;
+  }
+
+  .control-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .control-row span:last-child {
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
   }
 
   input[type="range"] {
     width: 100%;
+    accent-color: var(--accent);
   }
 
-  .small {
-    color: #aaa;
+  .save-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px 14px 16px;
+    border-top: 1px solid var(--line);
+  }
+
+  .tips {
+    color: var(--muted);
     font-size: 13px;
-    line-height: 1.4;
+    line-height: 1.45;
+    padding: 14px 4px 0;
+  }
+
+  .tips b {
+    color: var(--text);
+  }
+
+  @media (max-width: 520px) {
+    .app {
+      padding: 10px;
+    }
+
+    .brand-title {
+      font-size: 22px;
+    }
+
+    .preview-wrap {
+      min-height: 310px;
+    }
+
+    .primary-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .wide {
+      grid-column: span 1;
+    }
+
+    .save-row {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 </head>
 
 <body>
-<header>
-  <h1>ArchiveScan Mobile</h1>
-  <div class="small">Negative → Photo</div>
-</header>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="brand-title">ArchiveScan</div>
+      <div class="brand-subtitle">Turn negatives into photos</div>
+    </div>
+    <div class="pill" id="statusPill">Ready</div>
+  </header>
 
-<main>
-  <button onclick="startCamera()">Open Camera</button>
-  <button onclick="capturePhoto()">Capture Negative</button>
+  <section class="preview-card">
+    <div class="preview-top">
+      <span id="previewLabel">Camera / Preview</span>
+      <span id="modeLabel">Negative Mode</span>
+    </div>
 
-  <input type="file" accept="image/*" onchange="loadFile(event)" />
+    <div class="preview-wrap">
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas"></canvas>
 
-  <video id="video" autoplay playsinline></video>
-  <canvas id="canvas"></canvas>
+      <div class="empty-state" id="emptyState">
+        <div>
+          <strong>Start with a negative</strong>
+          Open the camera or choose an image from your phone.
+        </div>
+      </div>
+    </div>
 
-  <div class="controls">
-    <button onclick="processImage()">Convert Negative</button>
-    <button class="secondary" onclick="resetImage()">Reset</button>
-    <button onclick="downloadImage()">Download Photo</button>
+    <div class="primary-actions">
+      <button onclick="startCamera()">Open Camera</button>
+      <label class="file-label" for="fileInput">Choose Photo</label>
+      <input id="fileInput" type="file" accept="image/*" onchange="loadFile(event)" />
 
-    <label>Brightness: <span id="brightnessVal">0</span></label>
-    <input id="brightness" type="range" min="-100" max="100" value="0" oninput="updateValues(); processImage();" />
+      <button class="accent wide" onclick="captureOrConvert()" id="mainAction">Capture Negative</button>
+    </div>
+  </section>
 
-    <label>Contrast: <span id="contrastVal">10</span></label>
-    <input id="contrast" type="range" min="-100" max="100" value="10" oninput="updateValues(); processImage();" />
+  <section class="edit-panel">
+    <div class="panel-header">
+      <div class="panel-title">Fine Tune</div>
+      <div class="panel-note">Small moves usually look better than big ones.</div>
+    </div>
 
-    <label>Saturation: <span id="saturationVal">0</span></label>
-    <input id="saturation" type="range" min="-100" max="100" value="0" oninput="updateValues(); processImage();" />
+    <div class="sliders">
+      <div class="control">
+        <div class="control-row">
+          <span>Brightness</span>
+          <span id="brightnessVal">0</span>
+        </div>
+        <input id="brightness" type="range" min="-100" max="100" value="0" oninput="sliderChanged()" />
+      </div>
 
-    <label>Warmth / Color Balance: <span id="warmthVal">0</span></label>
-    <input id="warmth" type="range" min="-100" max="100" value="0" oninput="updateValues(); processImage();" />
+      <div class="control">
+        <div class="control-row">
+          <span>Contrast</span>
+          <span id="contrastVal">10</span>
+        </div>
+        <input id="contrast" type="range" min="-100" max="100" value="10" oninput="sliderChanged()" />
+      </div>
+
+      <div class="control">
+        <div class="control-row">
+          <span>Saturation</span>
+          <span id="saturationVal">0</span>
+        </div>
+        <input id="saturation" type="range" min="-100" max="100" value="0" oninput="sliderChanged()" />
+      </div>
+
+      <div class="control">
+        <div class="control-row">
+          <span>Warmth</span>
+          <span id="warmthVal">0</span>
+        </div>
+        <input id="warmth" type="range" min="-100" max="100" value="0" oninput="sliderChanged()" />
+      </div>
+    </div>
+
+    <div class="save-row">
+      <button class="ghost" onclick="resetEdits()">Reset Edits</button>
+      <button class="danger" onclick="clearImage()">Start Over</button>
+      <button class="accent" onclick="downloadImage()">Save Result</button>
+      <button class="ghost" onclick="toggleBeforeAfter()">Before / After</button>
+    </div>
+  </section>
+
+  <div class="tips">
+    <b>Best results:</b> place the negative over an evenly lit white screen or light pad.
+    Keep the phone square to the film. Avoid glare, shadows, and curled edges.
   </div>
-
-  <p class="small">
-    Tip: Put the negative in front of an evenly lit white screen or light pad.
-    Keep the camera square to the negative and avoid glare.
-  </p>
-</main>
+</div>
 
 <script>
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+const emptyState = document.getElementById("emptyState");
+const statusPill = document.getElementById("statusPill");
+const previewLabel = document.getElementById("previewLabel");
+const mainAction = document.getElementById("mainAction");
+
 let originalImageData = null;
+let processedImageData = null;
 let currentImageLoaded = false;
+let converted = false;
+let showingBefore = false;
+let cameraActive = false;
 
 async function startCamera() {
   try {
@@ -142,9 +400,35 @@ async function startCamera() {
     });
 
     video.srcObject = stream;
+    video.style.display = "block";
+    canvas.style.display = "none";
+    emptyState.style.display = "none";
+
+    cameraActive = true;
+    converted = false;
+    currentImageLoaded = false;
+
+    statusPill.textContent = "Camera";
+    previewLabel.textContent = "Live Camera";
+    mainAction.textContent = "Capture Negative";
   } catch (err) {
     alert("Could not open camera: " + err.message);
   }
+}
+
+function captureOrConvert() {
+  if (cameraActive && !currentImageLoaded) {
+    capturePhoto();
+    processImage();
+    return;
+  }
+
+  if (currentImageLoaded) {
+    processImage();
+    return;
+  }
+
+  alert("Open the camera or choose a photo first.");
 }
 
 function capturePhoto() {
@@ -158,7 +442,17 @@ function capturePhoto() {
 
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+  video.style.display = "none";
+  canvas.style.display = "block";
+
   currentImageLoaded = true;
+  cameraActive = false;
+  showingBefore = false;
+
+  statusPill.textContent = "Captured";
+  previewLabel.textContent = "Captured Negative";
+  mainAction.textContent = "Convert Again";
 }
 
 function loadFile(event) {
@@ -166,21 +460,29 @@ function loadFile(event) {
   if (!file) return;
 
   const img = new Image();
+
   img.onload = function () {
     canvas.width = img.width;
     canvas.height = img.height;
 
     ctx.drawImage(img, 0, 0);
     originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    video.style.display = "none";
+    canvas.style.display = "block";
+    emptyState.style.display = "none";
+
     currentImageLoaded = true;
+    converted = false;
+    showingBefore = false;
+    cameraActive = false;
+
+    statusPill.textContent = "Loaded";
+    previewLabel.textContent = "Loaded Negative";
+    mainAction.textContent = "Convert Negative";
   };
 
   img.src = URL.createObjectURL(file);
-}
-
-function resetImage() {
-  if (!originalImageData) return;
-  ctx.putImageData(originalImageData, 0, 0);
 }
 
 function processImage() {
@@ -198,7 +500,6 @@ function processImage() {
   let rAvg = 0, gAvg = 0, bAvg = 0;
   const pixelCount = src.length / 4;
 
-  // First pass: invert and estimate color cast
   for (let i = 0; i < src.length; i += 4) {
     const r = 255 - src[i];
     const g = 255 - src[i + 1];
@@ -221,32 +522,26 @@ function processImage() {
 
   const contrastFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
 
-  // Second pass: correction
   for (let i = 0; i < src.length; i += 4) {
     let r = 255 - src[i];
     let g = 255 - src[i + 1];
     let b = 255 - src[i + 2];
 
-    // Orange mask / white balance correction
     r *= rScale;
     g *= gScale;
     b *= bScale;
 
-    // Warmth adjustment
     r += warmth * 0.5;
     b -= warmth * 0.5;
 
-    // Contrast
     r = contrastFactor * (r - 128) + 128;
     g = contrastFactor * (g - 128) + 128;
     b = contrastFactor * (b - 128) + 128;
 
-    // Brightness
     r += brightness;
     g += brightness;
     b += brightness;
 
-    // Saturation
     const gray = 0.299 * r + 0.587 * g + 0.114 * b;
     const satFactor = 1 + saturation / 100;
 
@@ -260,29 +555,80 @@ function processImage() {
     data[i + 3] = src[i + 3];
   }
 
-  ctx.putImageData(output, 0, 0);
+  processedImageData = output;
+  ctx.putImageData(processedImageData, 0, 0);
+
+  converted = true;
+  showingBefore = false;
+
+  statusPill.textContent = "Converted";
+  previewLabel.textContent = "Converted Photo";
+  mainAction.textContent = "Reconvert";
 }
 
-function clamp(value) {
-  return Math.max(0, Math.min(255, value));
+function sliderChanged() {
+  updateValues();
+
+  if (currentImageLoaded) {
+    processImage();
+  }
 }
 
-function updateValues() {
-  document.getElementById("brightnessVal").textContent =
-    document.getElementById("brightness").value;
+function resetEdits() {
+  document.getElementById("brightness").value = 0;
+  document.getElementById("contrast").value = 10;
+  document.getElementById("saturation").value = 0;
+  document.getElementById("warmth").value = 0;
+  updateValues();
 
-  document.getElementById("contrastVal").textContent =
-    document.getElementById("contrast").value;
+  if (currentImageLoaded) {
+    processImage();
+  }
+}
 
-  document.getElementById("saturationVal").textContent =
-    document.getElementById("saturation").value;
+function clearImage() {
+  originalImageData = null;
+  processedImageData = null;
+  currentImageLoaded = false;
+  converted = false;
+  showingBefore = false;
+  cameraActive = false;
 
-  document.getElementById("warmthVal").textContent =
-    document.getElementById("warmth").value;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  canvas.style.display = "none";
+  video.style.display = "none";
+  emptyState.style.display = "flex";
+
+  statusPill.textContent = "Ready";
+  previewLabel.textContent = "Camera / Preview";
+  mainAction.textContent = "Capture Negative";
+}
+
+function toggleBeforeAfter() {
+  if (!currentImageLoaded || !converted) return;
+
+  if (showingBefore) {
+    ctx.putImageData(processedImageData, 0, 0);
+    previewLabel.textContent = "Converted Photo";
+    statusPill.textContent = "After";
+    showingBefore = false;
+  } else {
+    ctx.putImageData(originalImageData, 0, 0);
+    previewLabel.textContent = "Original Negative";
+    statusPill.textContent = "Before";
+    showingBefore = true;
+  }
 }
 
 function downloadImage() {
-  if (!currentImageLoaded) return;
+  if (!currentImageLoaded) {
+    alert("Nothing to save yet.");
+    return;
+  }
+
+  if (!converted) {
+    processImage();
+  }
 
   const link = document.createElement("a");
   link.download = "archivescan-photo.png";
@@ -290,7 +636,19 @@ function downloadImage() {
   link.click();
 }
 
+function updateValues() {
+  document.getElementById("brightnessVal").textContent = document.getElementById("brightness").value;
+  document.getElementById("contrastVal").textContent = document.getElementById("contrast").value;
+  document.getElementById("saturationVal").textContent = document.getElementById("saturation").value;
+  document.getElementById("warmthVal").textContent = document.getElementById("warmth").value;
+}
+
+function clamp(value) {
+  return Math.max(0, Math.min(255, value));
+}
+
 updateValues();
+clearImage();
 </script>
 </body>
 </html>
