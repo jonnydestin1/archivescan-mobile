@@ -43,7 +43,7 @@
     max-width: 980px;
     margin: 0 auto;
     padding: 12px;
-    padding-bottom: 170px;
+    padding-bottom: 175px;
   }
 
   header {
@@ -94,6 +94,7 @@
     color: var(--muted);
     font-size: 13px;
     border-bottom: 1px solid var(--line);
+    gap: 8px;
   }
 
   .preview-wrap {
@@ -105,6 +106,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    touch-action: none;
   }
 
   video, canvas {
@@ -298,6 +300,36 @@
     accent-color: var(--accent);
   }
 
+  .crop-overlay {
+    position: absolute;
+    border: 2px solid var(--accent);
+    background: rgba(243,179,71,0.08);
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.52);
+    display: none;
+    touch-action: none;
+  }
+
+  .crop-overlay::before,
+  .crop-overlay::after {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 3px solid var(--accent);
+    background: rgba(9,11,16,0.8);
+    border-radius: 50%;
+  }
+
+  .crop-overlay::before {
+    left: -10px;
+    top: -10px;
+  }
+
+  .crop-overlay::after {
+    right: -10px;
+    bottom: -10px;
+  }
+
   .bottom-editor {
     display: none;
     position: fixed;
@@ -374,6 +406,10 @@
     font-size: 13px;
   }
 
+  .crop-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .toolbar {
     max-width: 980px;
     margin: 0 auto;
@@ -422,7 +458,8 @@
     border: 1px solid var(--line);
     border-radius: 26px;
     box-shadow: 0 30px 90px rgba(0,0,0,0.7);
-    padding: 20px;
+    padding: 22px;
+    text-align: center;
   }
 
   .modal h2 {
@@ -435,7 +472,17 @@
     line-height: 1.5;
   }
 
-  .modal ul { padding-left: 20px; }
+  .modal ul {
+    padding-left: 0;
+    list-style-position: inside;
+    text-align: center;
+  }
+
+  .modal button {
+    margin: 8px auto 0;
+    display: block;
+    min-width: 150px;
+  }
 
   @media (max-width: 560px) {
     .app { padding: 10px; padding-bottom: 165px; }
@@ -520,8 +567,9 @@
         </span>
       </div>
 
-      <div class="preview-wrap">
+      <div class="preview-wrap" id="editPreviewWrap">
         <canvas id="canvas"></canvas>
+        <div class="crop-overlay" id="cropOverlay"></div>
       </div>
 
       <div class="before-after-wrap" id="beforeAfterWrap">
@@ -561,10 +609,12 @@
     </div>
 
     <div id="cropControls" style="display:none;">
-      <div class="tool-note">Crop tools are staged here. Real drag-crop comes next.</div>
-      <div class="tool-actions">
-        <button class="ghost" onclick="cropPlaceholder()">Crop</button>
-        <button class="ghost" onclick="rotatePlaceholder()">Rotate</button>
+      <div class="tool-note">Drag the crop box, then apply. Use flips if the revealed photo is reversed.</div>
+      <div class="tool-actions crop-actions">
+        <button class="ghost" onclick="startCrop()">Start Crop</button>
+        <button class="accent" onclick="applyCrop()">Apply Crop</button>
+        <button class="ghost" onclick="flipHorizontal()">Flip Horizontal</button>
+        <button class="ghost" onclick="flipVertical()">Flip Vertical</button>
       </div>
     </div>
 
@@ -574,7 +624,7 @@
 
     <div class="tool-actions">
       <button class="ghost" onclick="resetEdits()">Reset Edits</button>
-      <button class="good" onclick="saveCurrentToLibrary()">Keep In App</button>
+      <button class="good" onclick="saveCurrentToLibrary()">Save to Recent</button>
     </div>
   </div>
 
@@ -607,12 +657,19 @@ const tipModal = document.getElementById("tipModal");
 const beforeAfterWrap = document.getElementById("beforeAfterWrap");
 const beforeAfterSlider = document.getElementById("beforeAfterSlider");
 const recentGrid = document.getElementById("recentGrid");
+const cropOverlay = document.getElementById("cropOverlay");
+const editPreviewWrap = document.getElementById("editPreviewWrap");
 
 let db = null;
 let originalImageData = null;
 let processedImageData = null;
 let currentImageLoaded = false;
 let converted = false;
+
+let cropActive = false;
+let cropRect = { x: 0.1, y: 0.1, w: 0.8, h: 0.8 };
+let cropDragMode = null;
+let cropStart = null;
 
 function showTip(){ tipModal.style.display = "flex"; }
 function closeTip(){ tipModal.style.display = "none"; }
@@ -652,7 +709,6 @@ function saveScanRecord(dataUrl) {
     };
 
     store.put(record);
-
     tx.oncomplete = () => resolve(record);
     tx.onerror = () => reject(tx.error);
   });
@@ -724,7 +780,7 @@ function openSavedScan(scan) {
 
 async function saveCurrentToLibrary() {
   if (!processedImageData) {
-    alert("Nothing to keep yet.");
+    alert("Nothing to save yet.");
     return;
   }
 
@@ -734,7 +790,7 @@ async function saveCurrentToLibrary() {
   await saveScanRecord(dataUrl);
   await renderRecentScans();
 
-  statusPill.textContent = "Kept In App";
+  statusPill.textContent = "Saved to Recent";
 }
 
 async function startCamera() {
@@ -815,6 +871,8 @@ function showEditScreen() {
   bottomEditor.classList.add("active");
   canvas.style.display = "block";
   beforeAfterWrap.style.display = "none";
+  cropOverlay.style.display = "none";
+  cropActive = false;
 
   statusPill.textContent = "Editing";
   subtitle.textContent = "Fine tune and save";
@@ -831,6 +889,7 @@ function goToScan() {
   video.style.display = "none";
   emptyState.style.display = "flex";
   cameraControls.style.display = "none";
+  cropOverlay.style.display = "none";
 
   statusPill.textContent = "Ready";
   subtitle.textContent = "Reveal negatives into photos";
@@ -843,6 +902,7 @@ function openTool(tool) {
   ["lightBtn","colorBtn","cropBtn","compareBtn"].forEach(id => document.getElementById(id).classList.remove("active"));
   ["lightControls","colorControls","cropControls","compareControls"].forEach(id => document.getElementById(id).style.display = "none");
   beforeAfterWrap.style.display = "none";
+  cropOverlay.style.display = cropActive && tool === "crop" ? "block" : "none";
 
   if (tool === "light") {
     lightBtn.classList.add("active");
@@ -861,8 +921,8 @@ function openTool(tool) {
   if (tool === "crop") {
     cropBtn.classList.add("active");
     cropControls.style.display = "block";
-    toolTitle.textContent = "Crop";
-    toolNote.textContent = "Clean the edges and frame the photo.";
+    toolTitle.textContent = "Crop / Flip";
+    toolNote.textContent = "Crop edges or flip the image if the negative is reversed.";
   }
 
   if (tool === "compare") {
@@ -878,6 +938,7 @@ function openTool(tool) {
 function closeDrawer() {
   document.getElementById("toolDrawer").classList.remove("active");
   beforeAfterWrap.style.display = "none";
+  cropOverlay.style.display = "none";
   ["lightBtn","colorBtn","cropBtn","compareBtn"].forEach(id => document.getElementById(id).classList.remove("active"));
 }
 
@@ -965,17 +1026,50 @@ function updateBeforeAfter() {
   const amount = parseInt(beforeAfterSlider.value) / 100;
   const output = ctx.createImageData(canvas.width, canvas.height);
   const out = output.data;
-  const a = originalImageData.data;
+  const originalRevealed = makeAutoRevealedImageData(originalImageData).data;
   const b = processedImageData.data;
 
   for (let i = 0; i < out.length; i += 4) {
-    out[i] = a[i] * (1 - amount) + b[i] * amount;
-    out[i + 1] = a[i + 1] * (1 - amount) + b[i + 1] * amount;
-    out[i + 2] = a[i + 2] * (1 - amount) + b[i + 2] * amount;
+    out[i] = originalRevealed[i] * (1 - amount) + b[i] * amount;
+    out[i + 1] = originalRevealed[i + 1] * (1 - amount) + b[i + 1] * amount;
+    out[i + 2] = originalRevealed[i + 2] * (1 - amount) + b[i + 2] * amount;
     out[i + 3] = 255;
   }
 
   ctx.putImageData(output, 0, 0);
+}
+
+function makeAutoRevealedImageData(sourceImageData) {
+  const src = sourceImageData.data;
+  const output = ctx.createImageData(sourceImageData.width, sourceImageData.height);
+  const data = output.data;
+
+  let rAvg = 0, gAvg = 0, bAvg = 0;
+  const pixelCount = src.length / 4;
+
+  for (let i = 0; i < src.length; i += 4) {
+    rAvg += 255 - src[i];
+    gAvg += 255 - src[i + 1];
+    bAvg += 255 - src[i + 2];
+  }
+
+  rAvg /= pixelCount;
+  gAvg /= pixelCount;
+  bAvg /= pixelCount;
+
+  const grayAvg = (rAvg + gAvg + bAvg) / 3;
+  const rScale = grayAvg / Math.max(rAvg, 1);
+  const gScale = grayAvg / Math.max(gAvg, 1);
+  const bScale = grayAvg / Math.max(bAvg, 1);
+
+  for (let i = 0; i < src.length; i += 4) {
+    data[i] = clamp((255 - src[i]) * rScale);
+    data[i + 1] = clamp((255 - src[i + 1]) * gScale);
+    data[i + 2] = clamp((255 - src[i + 2]) * bScale);
+    data[i + 3] = 255;
+  }
+
+  return output;
 }
 
 function sliderChanged() {
@@ -990,12 +1084,188 @@ function resetEdits() {
   if (currentImageLoaded) processImage();
 }
 
-function cropPlaceholder() {
-  alert("Real drag-crop comes next.");
+function startCrop() {
+  if (!currentImageLoaded || !processedImageData) {
+    alert("Open or capture a photo first.");
+    return;
+  }
+
+  cropActive = true;
+  cropRect = { x: 0.1, y: 0.1, w: 0.8, h: 0.8 };
+  updateCropOverlay();
+  cropOverlay.style.display = "block";
 }
 
-function rotatePlaceholder() {
-  alert("Rotate tool comes next.");
+function updateCropOverlay() {
+  const canvasRect = canvas.getBoundingClientRect();
+  const wrapRect = editPreviewWrap.getBoundingClientRect();
+
+  const left = canvasRect.left - wrapRect.left + cropRect.x * canvasRect.width;
+  const top = canvasRect.top - wrapRect.top + cropRect.y * canvasRect.height;
+  const width = cropRect.w * canvasRect.width;
+  const height = cropRect.h * canvasRect.height;
+
+  cropOverlay.style.left = `${left}px`;
+  cropOverlay.style.top = `${top}px`;
+  cropOverlay.style.width = `${width}px`;
+  cropOverlay.style.height = `${height}px`;
+}
+
+cropOverlay.addEventListener("pointerdown", e => {
+  e.preventDefault();
+  const rect = cropOverlay.getBoundingClientRect();
+  const nearBottomRight = e.clientX > rect.right - 40 && e.clientY > rect.bottom - 40;
+  const nearTopLeft = e.clientX < rect.left + 40 && e.clientY < rect.top + 40;
+
+  cropDragMode = nearBottomRight ? "resizeBR" : nearTopLeft ? "resizeTL" : "move";
+  cropStart = {
+    x: e.clientX,
+    y: e.clientY,
+    rect: { ...cropRect }
+  };
+
+  cropOverlay.setPointerCapture(e.pointerId);
+});
+
+cropOverlay.addEventListener("pointermove", e => {
+  if (!cropDragMode || !cropStart) return;
+
+  const canvasRect = canvas.getBoundingClientRect();
+  const dx = (e.clientX - cropStart.x) / canvasRect.width;
+  const dy = (e.clientY - cropStart.y) / canvasRect.height;
+
+  if (cropDragMode === "move") {
+    cropRect.x = clamp01(cropStart.rect.x + dx);
+    cropRect.y = clamp01(cropStart.rect.y + dy);
+    cropRect.x = Math.min(cropRect.x, 1 - cropRect.w);
+    cropRect.y = Math.min(cropRect.y, 1 - cropRect.h);
+  }
+
+  if (cropDragMode === "resizeBR") {
+    cropRect.w = clamp01(cropStart.rect.w + dx);
+    cropRect.h = clamp01(cropStart.rect.h + dy);
+    cropRect.w = Math.max(0.08, Math.min(cropRect.w, 1 - cropRect.x));
+    cropRect.h = Math.max(0.08, Math.min(cropRect.h, 1 - cropRect.y));
+  }
+
+  if (cropDragMode === "resizeTL") {
+    let newX = clamp01(cropStart.rect.x + dx);
+    let newY = clamp01(cropStart.rect.y + dy);
+
+    const right = cropStart.rect.x + cropStart.rect.w;
+    const bottom = cropStart.rect.y + cropStart.rect.h;
+
+    newX = Math.min(newX, right - 0.08);
+    newY = Math.min(newY, bottom - 0.08);
+
+    cropRect.x = newX;
+    cropRect.y = newY;
+    cropRect.w = right - newX;
+    cropRect.h = bottom - newY;
+  }
+
+  updateCropOverlay();
+});
+
+cropOverlay.addEventListener("pointerup", e => {
+  cropDragMode = null;
+  cropStart = null;
+  cropOverlay.releasePointerCapture(e.pointerId);
+});
+
+function applyCrop() {
+  if (!cropActive || !processedImageData || !originalImageData) {
+    alert("Start Crop first.");
+    return;
+  }
+
+  const sx = Math.round(cropRect.x * canvas.width);
+  const sy = Math.round(cropRect.y * canvas.height);
+  const sw = Math.round(cropRect.w * canvas.width);
+  const sh = Math.round(cropRect.h * canvas.height);
+
+  if (sw < 10 || sh < 10) {
+    alert("Crop area is too small.");
+    return;
+  }
+
+  const croppedOriginal = cropImageData(originalImageData, sx, sy, sw, sh);
+  const croppedProcessed = cropImageData(processedImageData, sx, sy, sw, sh);
+
+  canvas.width = sw;
+  canvas.height = sh;
+
+  originalImageData = croppedOriginal;
+  processedImageData = croppedProcessed;
+
+  ctx.putImageData(processedImageData, 0, 0);
+
+  cropActive = false;
+  cropOverlay.style.display = "none";
+  statusPill.textContent = "Cropped";
+}
+
+function cropImageData(imageData, sx, sy, sw, sh) {
+  const tempCanvas = document.createElement("canvas");
+  const tempCtx = tempCanvas.getContext("2d");
+  tempCanvas.width = imageData.width;
+  tempCanvas.height = imageData.height;
+  tempCtx.putImageData(imageData, 0, 0);
+
+  const outCanvas = document.createElement("canvas");
+  const outCtx = outCanvas.getContext("2d");
+  outCanvas.width = sw;
+  outCanvas.height = sh;
+  outCtx.drawImage(tempCanvas, sx, sy, sw, sh, 0, 0, sw, sh);
+
+  return outCtx.getImageData(0, 0, sw, sh);
+}
+
+function flipHorizontal() {
+  flipImageDataSet("horizontal");
+}
+
+function flipVertical() {
+  flipImageDataSet("vertical");
+}
+
+function flipImageDataSet(direction) {
+  if (!originalImageData || !processedImageData) return;
+
+  originalImageData = flipImageData(originalImageData, direction);
+  processedImageData = flipImageData(processedImageData, direction);
+
+  canvas.width = processedImageData.width;
+  canvas.height = processedImageData.height;
+  ctx.putImageData(processedImageData, 0, 0);
+
+  cropActive = false;
+  cropOverlay.style.display = "none";
+  statusPill.textContent = direction === "horizontal" ? "Flipped H" : "Flipped V";
+}
+
+function flipImageData(imageData, direction) {
+  const tempCanvas = document.createElement("canvas");
+  const tempCtx = tempCanvas.getContext("2d");
+  tempCanvas.width = imageData.width;
+  tempCanvas.height = imageData.height;
+  tempCtx.putImageData(imageData, 0, 0);
+
+  const outCanvas = document.createElement("canvas");
+  const outCtx = outCanvas.getContext("2d");
+  outCanvas.width = imageData.width;
+  outCanvas.height = imageData.height;
+
+  if (direction === "horizontal") {
+    outCtx.translate(imageData.width, 0);
+    outCtx.scale(-1, 1);
+  } else {
+    outCtx.translate(0, imageData.height);
+    outCtx.scale(1, -1);
+  }
+
+  outCtx.drawImage(tempCanvas, 0, 0);
+  return outCtx.getImageData(0, 0, imageData.width, imageData.height);
 }
 
 function downloadImage() {
@@ -1035,6 +1305,14 @@ function updateValues() {
 function clamp(value) {
   return Math.max(0, Math.min(255, value));
 }
+
+function clamp01(value) {
+  return Math.max(0, Math.min(1, value));
+}
+
+window.addEventListener("resize", () => {
+  if (cropActive) updateCropOverlay();
+});
 
 async function startup() {
   try {
