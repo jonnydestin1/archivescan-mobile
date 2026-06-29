@@ -7,17 +7,19 @@
 
 <style>
   :root {
-    --bg: #0A0916;
-    --bg2: #100E24;
-    --panel: #17152A;
-    --panel2: #211E3A;
-    --text: #F6F6F9;
-    --muted: #A8A4BA;
-    --line: #302B52;
-    --accent: #8C6BFF;
-    --accent2: #6BEA84;
-    --danger: #F06B6B;
-    --shadow: rgba(0,0,0,0.55);
+    --bg: #090B10;
+    --bg2: #101521;
+    --panel: #171A22;
+    --panel2: #202634;
+    --panel3: #252C3B;
+    --text: #F5F3EE;
+    --muted: #A9A8A2;
+    --line: #333A48;
+    --accent: #F3B347;
+    --accent2: #D58A2A;
+    --danger: #D66868;
+    --good: #8FCF8F;
+    --shadow: rgba(0,0,0,0.58);
   }
 
   * { box-sizing: border-box; }
@@ -26,8 +28,7 @@
     margin: 0;
     min-height: 100%;
     background:
-      radial-gradient(circle at top left, rgba(140,107,255,0.22), transparent 38%),
-      radial-gradient(circle at bottom right, rgba(107,234,132,0.10), transparent 35%),
+      radial-gradient(circle at top, rgba(243,179,71,0.10), transparent 36%),
       linear-gradient(180deg, var(--bg2), var(--bg));
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
@@ -41,7 +42,7 @@
   .app {
     max-width: 980px;
     margin: 0 auto;
-    padding: 10px;
+    padding: 12px;
     padding-bottom: 170px;
   }
 
@@ -50,10 +51,11 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 2px 12px;
+    gap: 12px;
   }
 
   .brand-title {
-    font-size: 24px;
+    font-size: 25px;
     font-weight: 850;
     letter-spacing: -0.6px;
   }
@@ -66,15 +68,19 @@
 
   .pill {
     border: 1px solid var(--line);
-    background: rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.055);
     color: var(--muted);
     padding: 8px 10px;
     border-radius: 999px;
     font-size: 12px;
+    white-space: nowrap;
   }
 
-  .preview-card {
-    background: rgba(23,21,42,0.92);
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .card {
+    background: rgba(23,26,34,0.94);
     border: 1px solid var(--line);
     border-radius: 24px;
     overflow: hidden;
@@ -93,8 +99,8 @@
   .preview-wrap {
     position: relative;
     width: 100%;
-    min-height: 370px;
-    background: #020208;
+    min-height: 380px;
+    background: #020305;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -103,7 +109,7 @@
 
   video, canvas {
     width: 100%;
-    max-height: 72vh;
+    max-height: 74vh;
     display: block;
     background: #000;
   }
@@ -143,8 +149,8 @@
     width: 78px;
     height: 78px;
     border-radius: 50%;
-    border: 5px solid rgba(255,255,255,0.9);
-    background: rgba(255,255,255,0.18);
+    border: 5px solid rgba(245,243,238,0.92);
+    background: rgba(245,243,238,0.18);
     box-shadow: 0 0 0 4px rgba(0,0,0,0.45), 0 12px 34px rgba(0,0,0,0.6);
     pointer-events: auto;
     padding: 0;
@@ -157,13 +163,125 @@
     height: 52px;
     margin: auto;
     border-radius: 50%;
-    background: #fff;
+    background: var(--text);
+  }
+
+  button, .file-label {
+    appearance: none;
+    border: 0;
+    border-radius: 16px;
+    padding: 14px 12px;
+    font-size: 15px;
+    font-weight: 760;
+    cursor: pointer;
+    color: var(--text);
+    background: var(--panel2);
+    text-align: center;
+    user-select: none;
+  }
+
+  button:active, .file-label:active { transform: scale(0.985); }
+
+  .accent {
+    background: linear-gradient(180deg, var(--accent), var(--accent2));
+    color: #241604;
+  }
+
+  .ghost {
+    background: rgba(255,255,255,0.055);
+    border: 1px solid var(--line);
+  }
+
+  .danger {
+    background: rgba(214,104,104,0.14);
+    color: #ffd4d4;
+    border: 1px solid rgba(214,104,104,0.35);
+  }
+
+  .good {
+    background: rgba(143,207,143,0.16);
+    color: #d9ffda;
+    border: 1px solid rgba(143,207,143,0.34);
+  }
+
+  input[type="file"] { display: none; }
+
+  .scan-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px;
+    background: var(--panel);
+    border-top: 1px solid var(--line);
+  }
+
+  .tip-strip {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border: 1px solid rgba(243,179,71,0.35);
+    border-radius: 18px;
+    background: rgba(243,179,71,0.08);
+    color: #f7d89c;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .recent-section {
+    margin-top: 14px;
+  }
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 850;
+    margin: 0 0 8px 2px;
+  }
+
+  .recent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+    gap: 10px;
+  }
+
+  .recent-item {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .recent-item img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    background: #000;
+  }
+
+  .recent-item div {
+    font-size: 11px;
+    color: var(--muted);
+    padding: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .edit-header-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .edit-header-actions button {
+    padding: 9px 11px;
+    font-size: 12px;
+    border-radius: 999px;
   }
 
   .before-after-wrap {
     display: none;
     padding: 12px;
-    background: rgba(10,9,22,0.85);
+    background: rgba(9,11,16,0.85);
     border-top: 1px solid var(--line);
   }
 
@@ -175,70 +293,25 @@
     margin-bottom: 6px;
   }
 
-  .top-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    padding: 12px;
-    background: var(--panel);
-    border-top: 1px solid var(--line);
-  }
-
-  button, .file-label {
-    appearance: none;
-    border: 0;
-    border-radius: 16px;
-    padding: 14px 12px;
-    font-size: 15px;
-    font-weight: 750;
-    cursor: pointer;
-    color: var(--text);
-    background: var(--panel2);
-    text-align: center;
-    user-select: none;
-  }
-
-  button:active, .file-label:active { transform: scale(0.985); }
-
-  .accent {
-    background: linear-gradient(180deg, var(--accent), #6f50e8);
-    color: white;
-  }
-
-  .green {
-    background: linear-gradient(180deg, var(--accent2), #3cc866);
-    color: #06120a;
-  }
-
-  .ghost {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid var(--line);
-  }
-
-  .danger {
-    background: rgba(240,107,107,0.13);
-    color: #ffd0d0;
-    border: 1px solid rgba(240,107,107,0.35);
-  }
-
-  input[type="file"] { display: none; }
-
   input[type="range"] {
     width: 100%;
-    accent-color: var(--accent2);
+    accent-color: var(--accent);
   }
 
   .bottom-editor {
+    display: none;
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
     z-index: 20;
-    background: rgba(10,9,22,0.96);
+    background: rgba(9,11,16,0.97);
     border-top: 1px solid var(--line);
     backdrop-filter: blur(18px);
-    box-shadow: 0 -20px 60px rgba(0,0,0,0.48);
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.5);
   }
+
+  .bottom-editor.active { display: block; }
 
   .tool-drawer {
     max-width: 980px;
@@ -246,6 +319,8 @@
     padding: 12px 12px 8px;
     display: none;
   }
+
+  .tool-drawer.active { display: block; }
 
   .tool-title-row {
     display: flex;
@@ -255,23 +330,22 @@
   }
 
   .tool-title {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 850;
   }
 
   .tool-note {
     color: var(--muted);
     font-size: 12px;
+    margin-top: 2px;
   }
 
   .slider-row {
-    display: none;
+    display: flex;
     gap: 12px;
     align-items: center;
-    margin: 8px 0;
+    margin: 9px 0;
   }
-
-  .slider-row.active { display: flex; }
 
   .slider-name {
     width: 92px;
@@ -283,13 +357,13 @@
     width: 42px;
     text-align: right;
     font-size: 13px;
-    color: var(--accent2);
+    color: var(--accent);
     font-variant-numeric: tabular-nums;
   }
 
   .tool-actions {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
     margin-top: 10px;
   }
@@ -322,23 +396,13 @@
   }
 
   .tool-button .icon {
-    font-size: 20px;
+    font-size: 18px;
+    line-height: 1;
   }
 
   .tool-button.active {
-    color: var(--accent2);
-    background: rgba(107,234,132,0.10);
-  }
-
-  .tip-strip {
-    margin-top: 12px;
-    padding: 12px 14px;
-    border: 1px solid rgba(107,234,132,0.35);
-    border-radius: 18px;
-    background: rgba(107,234,132,0.08);
-    color: #c8ffd5;
-    font-size: 13px;
-    line-height: 1.45;
+    color: var(--accent);
+    background: rgba(243,179,71,0.10);
   }
 
   .modal-backdrop {
@@ -354,7 +418,7 @@
 
   .modal {
     width: min(520px, 100%);
-    background: #17152A;
+    background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 26px;
     box-shadow: 0 30px 90px rgba(0,0,0,0.7);
@@ -371,14 +435,14 @@
     line-height: 1.5;
   }
 
-  .modal ul {
-    padding-left: 20px;
-  }
+  .modal ul { padding-left: 20px; }
 
   @media (max-width: 560px) {
+    .app { padding: 10px; padding-bottom: 165px; }
     .preview-wrap { min-height: 340px; }
-    .top-actions { grid-template-columns: 1fr; }
+    .scan-actions { grid-template-columns: 1fr; }
     .slider-name { width: 80px; }
+    .brand-title { font-size: 23px; }
   }
 </style>
 </head>
@@ -394,7 +458,7 @@
       <li>Keep your phone square to the film.</li>
       <li>Avoid glare, shadows, blur, and curled edges.</li>
     </ul>
-    <button class="green" onclick="closeTip()">Got it</button>
+    <button class="accent" onclick="closeTip()">Got it</button>
   </div>
 </div>
 
@@ -402,120 +466,149 @@
   <header>
     <div>
       <div class="brand-title">ArchiveScan</div>
-      <div class="brand-subtitle">Reveal negatives into photos</div>
+      <div class="brand-subtitle" id="subtitle">Reveal negatives into photos</div>
     </div>
     <div class="pill" id="statusPill">Ready</div>
   </header>
 
-  <section class="preview-card">
-    <div class="preview-top">
-      <span id="previewLabel">Camera / Preview</span>
-      <span id="modeLabel">Reveal Mode</span>
-    </div>
+  <section id="scanScreen" class="screen active">
+    <section class="card">
+      <div class="preview-top">
+        <span>Scan</span>
+        <span>Camera / Upload</span>
+      </div>
 
-    <div class="preview-wrap">
-      <video id="video" autoplay playsinline></video>
-      <canvas id="canvas"></canvas>
+      <div class="preview-wrap">
+        <video id="video" autoplay playsinline></video>
 
-      <div class="empty-state" id="emptyState">
-        <div>
-          <strong>Start with a negative</strong>
-          Open the camera or choose an image.
+        <div class="empty-state" id="emptyState">
+          <div>
+            <strong>Start with a negative</strong>
+            Open the camera or choose an image.
+          </div>
+        </div>
+
+        <div class="camera-controls" id="cameraControls">
+          <button class="shutter" onclick="capturePhoto()" aria-label="Capture photo"></button>
         </div>
       </div>
 
-      <div class="camera-controls" id="cameraControls">
-        <button class="shutter" onclick="capturePhoto()" aria-label="Capture photo"></button>
+      <div class="scan-actions">
+        <button onclick="startCamera()">Open Camera</button>
+        <label class="file-label" for="fileInput">Choose Photo</label>
+        <input id="fileInput" type="file" accept="image/*" onchange="loadFile(event)" />
       </div>
+    </section>
+
+    <div class="tip-strip">
+      <b>Tip:</b> Put the negative in front of an evenly lit white screen or light pad. Keep the camera square and avoid glare.
     </div>
 
-    <div class="before-after-wrap" id="beforeAfterWrap">
-      <div class="before-after-label">
-        <span>Original</span>
-        <span>Revealed</span>
-      </div>
-      <input id="beforeAfterSlider" type="range" min="0" max="100" value="100" oninput="updateBeforeAfter()" />
-    </div>
-
-    <div class="top-actions">
-      <button onclick="startCamera()">Open Camera</button>
-      <label class="file-label" for="fileInput">Choose Photo</label>
-      <input id="fileInput" type="file" accept="image/*" onchange="loadFile(event)" />
-    </div>
+    <section class="recent-section">
+      <h3 class="section-title">Recent Scans</h3>
+      <div class="recent-grid" id="recentGrid"></div>
+    </section>
   </section>
 
-  <div class="tip-strip">
-    <b>Tip:</b> Put the negative in front of an evenly lit white screen or light pad. Keep the camera square and avoid glare.
-  </div>
+  <section id="editScreen" class="screen">
+    <section class="card">
+      <div class="preview-top">
+        <span id="previewLabel">Revealed Photo</span>
+        <span class="edit-header-actions">
+          <button class="ghost" onclick="goToScan()">New Photo</button>
+          <button class="accent" onclick="downloadImage()">Save</button>
+        </span>
+      </div>
+
+      <div class="preview-wrap">
+        <canvas id="canvas"></canvas>
+      </div>
+
+      <div class="before-after-wrap" id="beforeAfterWrap">
+        <div class="before-after-label">
+          <span>Original</span>
+          <span>Revealed</span>
+        </div>
+        <input id="beforeAfterSlider" type="range" min="0" max="100" value="100" oninput="updateBeforeAfter()" />
+      </div>
+    </section>
+  </section>
 </div>
 
-<div class="bottom-editor">
+<div class="bottom-editor" id="bottomEditor">
   <div class="tool-drawer" id="toolDrawer">
     <div class="tool-title-row">
       <div>
         <div class="tool-title" id="toolTitle">Light</div>
-        <div class="tool-note" id="toolNote">Adjust the revealed photo while keeping the image visible.</div>
+        <div class="tool-note" id="toolNote">Shape the whites, blacks, highlights, and shadows.</div>
       </div>
       <button class="ghost" style="padding:8px 10px;border-radius:999px;font-size:12px;" onclick="closeDrawer()">Close</button>
     </div>
 
     <div id="lightControls">
-      <div class="slider-row active"><div class="slider-name">Whites</div><input id="whites" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="whitesVal">0</div></div>
-      <div class="slider-row active"><div class="slider-name">Blacks</div><input id="blacks" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="blacksVal">0</div></div>
-      <div class="slider-row active"><div class="slider-name">Highlights</div><input id="highlights" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="highlightsVal">0</div></div>
-      <div class="slider-row active"><div class="slider-name">Shadows</div><input id="shadows" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="shadowsVal">0</div></div>
-      <div class="slider-row active"><div class="slider-name">Brightness</div><input id="brightness" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="brightnessVal">0</div></div>
-      <div class="slider-row active"><div class="slider-name">Contrast</div><input id="contrast" type="range" min="-100" max="100" value="10" oninput="sliderChanged()"><div class="slider-value" id="contrastVal">10</div></div>
+      <div class="slider-row"><div class="slider-name">Whites</div><input id="whites" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="whitesVal">0</div></div>
+      <div class="slider-row"><div class="slider-name">Blacks</div><input id="blacks" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="blacksVal">0</div></div>
+      <div class="slider-row"><div class="slider-name">Highlights</div><input id="highlights" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="highlightsVal">0</div></div>
+      <div class="slider-row"><div class="slider-name">Shadows</div><input id="shadows" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="shadowsVal">0</div></div>
+      <div class="slider-row"><div class="slider-name">Brightness</div><input id="brightness" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="brightnessVal">0</div></div>
+      <div class="slider-row"><div class="slider-name">Contrast</div><input id="contrast" type="range" min="-100" max="100" value="10" oninput="sliderChanged()"><div class="slider-value" id="contrastVal">10</div></div>
     </div>
 
     <div id="colorControls" style="display:none;">
-      <div class="slider-row active"><div class="slider-name">Saturation</div><input id="saturation" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="saturationVal">0</div></div>
-      <div class="slider-row active"><div class="slider-name">Warmth</div><input id="warmth" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="warmthVal">0</div></div>
-      <div class="slider-row active"><div class="slider-name">Tint</div><input id="tint" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="tintVal">0</div></div>
+      <div class="slider-row"><div class="slider-name">Saturation</div><input id="saturation" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="saturationVal">0</div></div>
+      <div class="slider-row"><div class="slider-name">Warmth</div><input id="warmth" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="warmthVal">0</div></div>
+      <div class="slider-row"><div class="slider-name">Tint</div><input id="tint" type="range" min="-100" max="100" value="0" oninput="sliderChanged()"><div class="slider-value" id="tintVal">0</div></div>
     </div>
 
     <div id="cropControls" style="display:none;">
       <div class="tool-note">Crop tools are staged here. Real drag-crop comes next.</div>
       <div class="tool-actions">
         <button class="ghost" onclick="cropPlaceholder()">Crop</button>
-        <button class="ghost" onclick="rotateCanvas()">Rotate</button>
-        <button class="ghost" onclick="cropPlaceholder()">Perspective</button>
+        <button class="ghost" onclick="rotatePlaceholder()">Rotate</button>
       </div>
     </div>
 
-    <div id="beforeControls" style="display:none;">
-      <div class="tool-note">Drag the reveal slider under the image to compare the negative with the finished photo.</div>
+    <div id="compareControls" style="display:none;">
+      <div class="tool-note">Use the slider under the image to compare the original negative with the revealed photo.</div>
     </div>
 
     <div class="tool-actions">
-      <button class="ghost" onclick="resetEdits()">Reset</button>
-      <button class="accent" onclick="processImage()">Reveal</button>
-      <button class="green" onclick="downloadImage()">Save</button>
+      <button class="ghost" onclick="resetEdits()">Reset Edits</button>
+      <button class="good" onclick="saveCurrentToLibrary()">Keep In App</button>
     </div>
   </div>
 
   <div class="toolbar">
-    <button class="tool-button" id="cameraBtn" onclick="startCamera()"><span class="icon">📷</span><span>Camera</span></button>
-    <button class="tool-button" id="lightBtn" onclick="openTool('light')"><span class="icon">💡</span><span>Light</span></button>
-    <button class="tool-button" id="colorBtn" onclick="openTool('color')"><span class="icon">🎨</span><span>Color</span></button>
-    <button class="tool-button" id="cropBtn" onclick="openTool('crop')"><span class="icon">✂️</span><span>Crop</span></button>
-    <button class="tool-button" id="beforeBtn" onclick="openTool('before')"><span class="icon">↔️</span><span>Compare</span></button>
+    <button class="tool-button" id="lightBtn" onclick="openTool('light')"><span class="icon">☼</span><span>Light</span></button>
+    <button class="tool-button" id="colorBtn" onclick="openTool('color')"><span class="icon">◐</span><span>Color</span></button>
+    <button class="tool-button" id="cropBtn" onclick="openTool('crop')"><span class="icon">▣</span><span>Crop</span></button>
+    <button class="tool-button" id="compareBtn" onclick="openTool('compare')"><span class="icon">⇄</span><span>Compare</span></button>
+    <button class="tool-button" onclick="downloadImage()"><span class="icon">⇩</span><span>Save</span></button>
   </div>
 </div>
 
 <script>
+const DB_NAME = "ArchiveScanDB";
+const DB_VERSION = 1;
+const STORE_NAME = "scans";
+
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+const scanScreen = document.getElementById("scanScreen");
+const editScreen = document.getElementById("editScreen");
+const bottomEditor = document.getElementById("bottomEditor");
 const emptyState = document.getElementById("emptyState");
 const statusPill = document.getElementById("statusPill");
-const previewLabel = document.getElementById("previewLabel");
+const subtitle = document.getElementById("subtitle");
 const cameraControls = document.getElementById("cameraControls");
 const tipModal = document.getElementById("tipModal");
 const beforeAfterWrap = document.getElementById("beforeAfterWrap");
 const beforeAfterSlider = document.getElementById("beforeAfterSlider");
+const recentGrid = document.getElementById("recentGrid");
 
+let db = null;
 let originalImageData = null;
 let processedImageData = null;
 let currentImageLoaded = false;
@@ -524,11 +617,231 @@ let converted = false;
 function showTip(){ tipModal.style.display = "flex"; }
 function closeTip(){ tipModal.style.display = "none"; }
 
-function openTool(tool) {
-  document.getElementById("toolDrawer").style.display = "block";
+function initDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-  ["cameraBtn","lightBtn","colorBtn","cropBtn","beforeBtn"].forEach(id => document.getElementById(id).classList.remove("active"));
-  ["lightControls","colorControls","cropControls","beforeControls"].forEach(id => document.getElementById(id).style.display = "none");
+    request.onupgradeneeded = event => {
+      const database = event.target.result;
+      if (!database.objectStoreNames.contains(STORE_NAME)) {
+        const store = database.createObjectStore(STORE_NAME, { keyPath: "id" });
+        store.createIndex("createdAt", "createdAt", { unique: false });
+      }
+    };
+
+    request.onsuccess = event => {
+      db = event.target.result;
+      resolve(db);
+    };
+
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function saveScanRecord(dataUrl) {
+  return new Promise((resolve, reject) => {
+    if (!db) return reject("Database not ready.");
+
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+
+    const record = {
+      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+      createdAt: Date.now(),
+      image: dataUrl
+    };
+
+    store.put(record);
+
+    tx.oncomplete = () => resolve(record);
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+function getAllScans() {
+  return new Promise((resolve, reject) => {
+    if (!db) return resolve([]);
+
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+      const scans = request.result || [];
+      scans.sort((a, b) => b.createdAt - a.createdAt);
+      resolve(scans);
+    };
+
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function renderRecentScans() {
+  const scans = await getAllScans();
+  recentGrid.innerHTML = "";
+
+  if (!scans.length) {
+    recentGrid.innerHTML = '<div style="color:var(--muted);font-size:13px;">No saved scans yet.</div>';
+    return;
+  }
+
+  scans.slice(0, 12).forEach(scan => {
+    const item = document.createElement("div");
+    item.className = "recent-item";
+    item.onclick = () => openSavedScan(scan);
+
+    const img = document.createElement("img");
+    img.src = scan.image;
+
+    const label = document.createElement("div");
+    label.textContent = new Date(scan.createdAt).toLocaleDateString();
+
+    item.appendChild(img);
+    item.appendChild(label);
+    recentGrid.appendChild(item);
+  });
+}
+
+function openSavedScan(scan) {
+  const img = new Image();
+  img.onload = function () {
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+
+    originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    processedImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    currentImageLoaded = true;
+    converted = true;
+
+    showEditScreen();
+    statusPill.textContent = "Saved Scan";
+    subtitle.textContent = "Editing saved scan";
+  };
+  img.src = scan.image;
+}
+
+async function saveCurrentToLibrary() {
+  if (!processedImageData) {
+    alert("Nothing to keep yet.");
+    return;
+  }
+
+  ctx.putImageData(processedImageData, 0, 0);
+  const dataUrl = canvas.toDataURL("image/png");
+
+  await saveScanRecord(dataUrl);
+  await renderRecentScans();
+
+  statusPill.textContent = "Kept In App";
+}
+
+async function startCamera() {
+  try {
+    closeDrawer();
+    stopCamera();
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } },
+      audio: false
+    });
+
+    video.srcObject = stream;
+    video.style.display = "block";
+    emptyState.style.display = "none";
+    cameraControls.style.display = "flex";
+
+    statusPill.textContent = "Camera";
+  } catch (err) {
+    alert("Could not open camera: " + err.message);
+  }
+}
+
+function stopCamera() {
+  const stream = video.srcObject;
+  if (stream) stream.getTracks().forEach(track => track.stop());
+  video.srcObject = null;
+}
+
+function capturePhoto() {
+  if (!video.videoWidth) {
+    alert("Camera not ready yet.");
+    return;
+  }
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+  stopCamera();
+
+  currentImageLoaded = true;
+  converted = false;
+
+  processImage();
+  showEditScreen();
+  saveCurrentToLibrary();
+}
+
+function loadFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const img = new Image();
+  img.onload = function () {
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+
+    originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    currentImageLoaded = true;
+    converted = false;
+
+    processImage();
+    showEditScreen();
+    saveCurrentToLibrary();
+  };
+
+  img.src = URL.createObjectURL(file);
+}
+
+function showEditScreen() {
+  scanScreen.classList.remove("active");
+  editScreen.classList.add("active");
+  bottomEditor.classList.add("active");
+  canvas.style.display = "block";
+  beforeAfterWrap.style.display = "none";
+
+  statusPill.textContent = "Editing";
+  subtitle.textContent = "Fine tune and save";
+  openTool("light");
+}
+
+function goToScan() {
+  stopCamera();
+  scanScreen.classList.add("active");
+  editScreen.classList.remove("active");
+  bottomEditor.classList.remove("active");
+  closeDrawer();
+
+  video.style.display = "none";
+  emptyState.style.display = "flex";
+  cameraControls.style.display = "none";
+
+  statusPill.textContent = "Ready";
+  subtitle.textContent = "Reveal negatives into photos";
+  beforeAfterWrap.style.display = "none";
+}
+
+function openTool(tool) {
+  document.getElementById("toolDrawer").classList.add("active");
+
+  ["lightBtn","colorBtn","cropBtn","compareBtn"].forEach(id => document.getElementById(id).classList.remove("active"));
+  ["lightControls","colorControls","cropControls","compareControls"].forEach(id => document.getElementById(id).style.display = "none");
   beforeAfterWrap.style.display = "none";
 
   if (tool === "light") {
@@ -552,109 +865,24 @@ function openTool(tool) {
     toolNote.textContent = "Clean the edges and frame the photo.";
   }
 
-  if (tool === "before") {
-    beforeBtn.classList.add("active");
-    beforeControls.style.display = "block";
+  if (tool === "compare") {
+    compareBtn.classList.add("active");
+    compareControls.style.display = "block";
     beforeAfterWrap.style.display = "block";
-    toolTitle.textContent = "Before / After";
-    toolNote.textContent = "Slide to reveal the finished image.";
+    toolTitle.textContent = "Compare";
+    toolNote.textContent = "Slide to compare original and revealed images.";
     updateBeforeAfter();
   }
 }
 
 function closeDrawer() {
-  document.getElementById("toolDrawer").style.display = "none";
+  document.getElementById("toolDrawer").classList.remove("active");
   beforeAfterWrap.style.display = "none";
-  ["cameraBtn","lightBtn","colorBtn","cropBtn","beforeBtn"].forEach(id => document.getElementById(id).classList.remove("active"));
-}
-
-async function startCamera() {
-  try {
-    closeDrawer();
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } },
-      audio: false
-    });
-
-    video.srcObject = stream;
-    video.style.display = "block";
-    canvas.style.display = "none";
-    emptyState.style.display = "none";
-    cameraControls.style.display = "flex";
-    beforeAfterWrap.style.display = "none";
-
-    currentImageLoaded = false;
-    converted = false;
-
-    cameraBtn.classList.add("active");
-    statusPill.textContent = "Camera";
-    previewLabel.textContent = "Live Camera";
-  } catch (err) {
-    alert("Could not open camera: " + err.message);
-  }
-}
-
-function stopCamera() {
-  const stream = video.srcObject;
-  if (stream) stream.getTracks().forEach(track => track.stop());
-  video.srcObject = null;
-}
-
-function capturePhoto() {
-  if (!video.videoWidth) {
-    alert("Camera not ready yet.");
-    return;
-  }
-
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-  stopCamera();
-  video.style.display = "none";
-  canvas.style.display = "block";
-  cameraControls.style.display = "none";
-
-  currentImageLoaded = true;
-  statusPill.textContent = "Captured";
-  previewLabel.textContent = "Captured Negative";
-
-  processImage();
-}
-
-function loadFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const img = new Image();
-  img.onload = function () {
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0);
-
-    originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-    video.style.display = "none";
-    canvas.style.display = "block";
-    emptyState.style.display = "none";
-    cameraControls.style.display = "none";
-
-    currentImageLoaded = true;
-    statusPill.textContent = "Loaded";
-    previewLabel.textContent = "Loaded Negative";
-
-    processImage();
-  };
-  img.src = URL.createObjectURL(file);
+  ["lightBtn","colorBtn","cropBtn","compareBtn"].forEach(id => document.getElementById(id).classList.remove("active"));
 }
 
 function processImage() {
-  if (!currentImageLoaded || !originalImageData) {
-    alert("Open the camera or choose a photo first.");
-    return;
-  }
+  if (!currentImageLoaded || !originalImageData) return;
 
   const vals = getSliderValues();
   const src = new Uint8ClampedArray(originalImageData.data);
@@ -717,9 +945,6 @@ function processImage() {
   converted = true;
   beforeAfterSlider.value = 100;
   ctx.putImageData(processedImageData, 0, 0);
-
-  statusPill.textContent = "Revealed";
-  previewLabel.textContent = "Revealed Photo";
 }
 
 function applyLightControls(value, vals) {
@@ -751,7 +976,6 @@ function updateBeforeAfter() {
   }
 
   ctx.putImageData(output, 0, 0);
-  previewLabel.textContent = amount < 0.5 ? "Original Negative" : "Revealed Photo";
 }
 
 function sliderChanged() {
@@ -766,23 +990,19 @@ function resetEdits() {
   if (currentImageLoaded) processImage();
 }
 
-function rotateCanvas() {
-  if (!originalImageData) return;
-  alert("Rotate tool is staged. Real rotate/crop comes next.");
+function cropPlaceholder() {
+  alert("Real drag-crop comes next.");
 }
 
-function cropPlaceholder() {
-  if (!currentImageLoaded) alert("Capture or choose a negative first.");
-  else alert("Crop tool is next. Real drag-crop comes in the next pass.");
+function rotatePlaceholder() {
+  alert("Rotate tool comes next.");
 }
 
 function downloadImage() {
-  if (!currentImageLoaded) {
+  if (!processedImageData) {
     alert("Nothing to save yet.");
     return;
   }
-
-  if (!converted) processImage();
 
   ctx.putImageData(processedImageData, 0, 0);
 
@@ -816,7 +1036,19 @@ function clamp(value) {
   return Math.max(0, Math.min(255, value));
 }
 
-updateValues();
+async function startup() {
+  try {
+    await initDB();
+    await renderRecentScans();
+  } catch (err) {
+    console.warn("IndexedDB unavailable:", err);
+    recentGrid.innerHTML = '<div style="color:var(--muted);font-size:13px;">Recent scans unavailable.</div>';
+  }
+
+  updateValues();
+}
+
+startup();
 </script>
 </body>
 </html>
